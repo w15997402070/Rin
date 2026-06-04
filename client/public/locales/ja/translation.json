@@ -181,6 +181,12 @@
     "title": "ログイン",
     "username": {
       "placeholder": "ユーザー名を入力してください"
+    },
+    "register": {
+      "title": "アカウント作成",
+      "submit": "登録",
+      "to_login": "すでにアカウントをお持ちですか？ログイン",
+      "to_register": "アカウントをお持ちでないですか？登録"
     }
   },
   "logout": "ログアウト",

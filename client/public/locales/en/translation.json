@@ -190,6 +190,12 @@
     "title": "Login",
     "username": {
       "placeholder": "Please enter your username"
+    },
+    "register": {
+      "title": "Create Account",
+      "submit": "Register",
+      "to_login": "Already have an account? Login",
+      "to_register": "Don't have an account? Register"
     }
   },
   "logout": "Logout",

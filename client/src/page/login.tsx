@@ -11,6 +11,7 @@ import { getLoginRedirectPath } from "../utils/auth-redirect";
 export function LoginPage() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [isRegister, setIsRegister] = useState(false);
     const [authStatus, setAuthStatus] = useState<{ github: boolean; password: boolean }>({ github: false, password: false });
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
@@ -25,7 +26,7 @@ export function LoginPage() {
         });
     }, []);
 
-    const handleLogin = async () => {
+    const handleAuth = async () => {
         if (!username || !password) {
             setError(t('login.error.empty'));
             return;
@@ -35,10 +36,14 @@ export function LoginPage() {
         setError('');
 
         try {
-            const { data, error: apiError } = await client.auth.login({ username, password });
+            const apiCall = isRegister 
+                ? client.auth.register({ username, password })
+                : client.auth.login({ username, password });
+
+            const { data, error: apiError } = await apiCall;
 
             if (apiError) {
-                setError(t('login.error.invalid'));
+                setError(isRegister ? apiError.value : t('login.error.invalid'));
                 setIsLoading(false);
                 return;
             }
@@ -63,7 +68,7 @@ export function LoginPage() {
     return (
         <div className="flex items-center justify-center my-8">
             <div className="bg-w w-full max-w-md flex flex-col items-center justify-between p-8 space-y-4 t-primary rounded-2xl shadow-lg">
-                <p className="text-2xl font-bold">{t('login.title')}</p>
+                <p className="text-2xl font-bold">{isRegister ? t('login.register.title') : t('login.title')}</p>
 
                 {/* Error message */}
                 {error && (
@@ -85,15 +90,26 @@ export function LoginPage() {
                             setValue={setPassword}
                             placeholder={t('login.password.placeholder')}
                             type="password"
-                            onSubmit={handleLogin}
+                            onSubmit={handleAuth}
                             disabled={isLoading}
                         />
-                        <div className="flex flex-row items-center space-x-4 pt-2">
+                        <div className="flex flex-col items-center space-y-2 w-full pt-2">
                             <ButtonWithLoading
-                                title={isLoading ? t("login.loading") : t("login.title")}
-                                onClick={handleLogin}
+                                title={isLoading ? t("login.loading") : (isRegister ? t("login.register.submit") : t("login.title"))}
+                                onClick={handleAuth}
                                 loading={isLoading}
                             />
+                            <button
+                                type="button"
+                                className="text-sm text-theme hover:underline pt-2"
+                                onClick={() => {
+                                    setIsRegister(!isRegister);
+                                    setError('');
+                                }}
+                                disabled={isLoading}
+                            >
+                                {isRegister ? t('login.register.to_login') : t('login.register.to_register')}
+                            </button>
                         </div>
                     </>
                 )}

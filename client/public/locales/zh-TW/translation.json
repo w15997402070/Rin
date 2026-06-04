@@ -190,6 +190,12 @@
     "title": "登入",
     "username": {
       "placeholder": "請輸入用戶名"
+    },
+    "register": {
+      "title": "建立帳號",
+      "submit": "註冊",
+      "to_login": "已有帳號？去登入",
+      "to_register": "沒有帳號？去註冊"
     }
   },
   "logout": "登出",

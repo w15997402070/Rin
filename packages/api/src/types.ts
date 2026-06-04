@@ -320,6 +320,7 @@ export const API_PATHS = {
   // Auth
   AUTH_STATUS: '/api/auth/status',
   AUTH_LOGIN: '/api/auth/login',
+  AUTH_REGISTER: '/api/auth/register',
 
   // User
   USER_PROFILE: '/api/user/profile',

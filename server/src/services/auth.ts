@@ -142,6 +142,82 @@ export function PasswordAuthService(): Hono<{
         });
     });
 
+    // Register with username and password
+    app.post("/register", async (c: AppContext) => {
+        const jwt = c.get('jwt');
+        const db = c.get('db');
+        const env = c.env;
+
+        const { username, password } = await profileAsync(c, 'auth_register_parse', () => c.req.json()) as { username: string; password: string };
+
+        if (!username || !password) {
+            throw new BadRequestError('Username and password are required');
+        }
+
+        if (username.length < 3 || username.length > 20) {
+            throw new BadRequestError('Username must be between 3 and 20 characters');
+        }
+
+        if (password.length < 6) {
+            throw new BadRequestError('Password must be at least 6 characters');
+        }
+
+        // Check if admin credentials username is reserved
+        const adminUsername = env.ADMIN_USERNAME;
+        if (adminUsername && username === adminUsername) {
+            throw new BadRequestError('Username is reserved');
+        }
+
+        // Check if username already exists
+        const existingUser = await profileAsync(c, 'auth_register_lookup', () => db.query.users.findFirst({
+            where: eq(users.username, username)
+        }));
+
+        if (existingUser) {
+            throw new BadRequestError('Username is already taken');
+        }
+
+        // Hash the password
+        const hashedPassword = await profileAsync(c, 'auth_register_hash', () => hashPassword(password));
+
+        // Determine permissions: first user is admin (permission = 1), others are regular users (permission = 0)
+        const anyUserCheck = await profileAsync(c, 'auth_register_first_lookup', () => db.query.users.findMany({ limit: 1 }));
+        const isFirstUser = anyUserCheck.length === 0;
+        const permission = isFirstUser ? 1 : 0;
+
+        // Create new user
+        const result = await profileAsync(c, 'auth_register_insert', () => db.insert(users).values({
+            username: username,
+            openid: "password:" + username,
+            avatar: "",
+            permission: permission,
+            password: hashedPassword,
+        }).returning({ insertedId: users.id }));
+
+        if (!result || result.length === 0) {
+            throw new InternalServerError('Failed to register user');
+        }
+
+        const userId = result[0].insertedId;
+
+        // Generate JWT token
+        const token = await profileAsync(c, 'auth_register_token', () => jwt.sign({ id: userId }));
+
+        // Set JWT cookie using Hono helper
+        setJWTCookie(c, token);
+
+        return c.json({
+            success: true,
+            token: token,
+            user: {
+                id: userId,
+                username: username,
+                avatar: "",
+                permission: permission === 1,
+            }
+        });
+    });
+
     // Check if password login is available
     app.get("/status", async (c: AppContext) => {
         const env = c.env;

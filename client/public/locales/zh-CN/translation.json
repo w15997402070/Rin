@@ -190,6 +190,12 @@
     "title": "登录",
     "username": {
       "placeholder": "请输入用户名"
+    },
+    "register": {
+      "title": "创建账号",
+      "submit": "注册",
+      "to_login": "已有账号？去登录",
+      "to_register": "没有账号？去注册"
     }
   },
   "logout": "退出登录",

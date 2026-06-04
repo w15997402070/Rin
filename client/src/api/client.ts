@@ -606,6 +606,11 @@ class AuthAPI {
   async login(body: LoginRequest): Promise<ApiResponse<LoginResponse>> {
     return this.http.post<LoginResponse>("/api/auth/login", body);
   }
+
+  // POST /api/auth/register
+  async register(body: LoginRequest): Promise<ApiResponse<LoginResponse>> {
+    return this.http.post<LoginResponse>("/api/auth/register", body);
+  }
 }
 
 /**
