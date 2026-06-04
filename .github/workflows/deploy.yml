@@ -73,7 +73,7 @@ jobs:
           else
             # Auto deployment from workflow_run - check ref
             REF=$(cat ./artifacts/build-meta/ref 2>/dev/null || echo "unknown")
-            if [[ "$REF" == "refs/heads/main" || "$REF" == "refs/heads/master" || "$REF" == "refs/heads/develop" ]]; then
+            if [[ "$REF" == "refs/heads/main" || "$REF" == "refs/heads/master" ]]; then
               echo "is_production=true" >> $GITHUB_OUTPUT
             else
               echo "is_production=false" >> $GITHUB_OUTPUT
