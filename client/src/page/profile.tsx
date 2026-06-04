@@ -6,6 +6,7 @@ import { client } from "../app/runtime";
 import { ImageUploadInput } from "../components/image-upload-input";
 import { Input } from "../components/input";
 import { ProfileContext } from "../state/profile";
+import { getAuthToken } from "../utils/auth";
 
 
 export function ProfilePage() {
@@ -16,6 +17,8 @@ export function ProfilePage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [token, setToken] = useState('');
+    const [copyFeedback, setCopyFeedback] = useState(false);
 
     // Load current profile data and redirect to login if not authenticated
     useEffect(() => {
@@ -31,6 +34,7 @@ export function ProfilePage() {
         // Load current profile data
         setUsername(profile.name || '');
         setAvatar(profile.avatar || '');
+        setToken(getAuthToken() || '');
     }, [profile, setLocation]);
 
     const handleSubmit = async () => {
@@ -124,6 +128,38 @@ export function ProfilePage() {
                             placeholder={t('profile.username_placeholder')}
                             disabled={isLoading}
                         />
+                    </div>
+
+                    {/* API Token section */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium t-secondary">{t('profile.api_token')}</label>
+                        <div className="flex space-x-2">
+                            <div className="flex-1">
+                                <Input
+                                    value={token}
+                                    setValue={() => {}}
+                                    disabled={true}
+                                    type="password"
+                                    placeholder=""
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                className="px-4 py-2 bg-theme text-white rounded-xl text-sm font-medium hover:opacity-90 active:scale-95 transition-all duration-200 shadow-sm whitespace-nowrap"
+                                onClick={() => {
+                                    if (token) {
+                                        navigator.clipboard.writeText(token);
+                                        setCopyFeedback(true);
+                                        setTimeout(() => setCopyFeedback(false), 2000);
+                                    }
+                                }}
+                            >
+                                {copyFeedback ? t('profile.copied') : t('profile.copy')}
+                            </button>
+                        </div>
+                        <p className="text-left text-xs t-secondary">
+                            {t('profile.api_token_hint')}
+                        </p>
                     </div>
 
                     {/* Submit button */}

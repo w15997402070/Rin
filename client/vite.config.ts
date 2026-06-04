@@ -19,9 +19,9 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       react(),
-      // Only open visualizer in build mode
-      visualizer({ open: !isDev })
-    ],
+      // Only run and open visualizer when ANALYZE environment variable is set
+      process.env.ANALYZE ? visualizer({ open: true }) : null
+    ].filter(Boolean),
     server: {
       proxy: {
         "/api": {
